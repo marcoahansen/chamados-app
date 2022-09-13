@@ -7,12 +7,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import DialogTitle from '@mui/material/DialogTitle';
 import { Box } from '@mui/system';
 
-export default function Modal({conteudo, toggle}) {
+export default function Modal({conteudo, toggle, open}) {
   return (
       <Dialog
         onClose={toggle}
-        open={toggle}
+        open={open}
         aria-labelledby="dialog-title"
+        
       >
         <DialogTitle sx={{ p: 2, display: 'flex', alignItems:'center'}} id="dialog-title">
         Detalhes do chamado
@@ -20,24 +21,24 @@ export default function Modal({conteudo, toggle}) {
         </DialogTitle>
         <DialogContent>
           <Box>
-            Clliente: {conteudo.cliente}
+            Clliente: {conteudo?.cliente}
           </Box>
           <Box>
-            Assunto: {conteudo.assunto}
+            Assunto: {conteudo?.assunto}
           </Box>
           <Box>
-            Cadastrado em: {conteudo.created}
+            Cadastrado em: {conteudo?.created}
           </Box>
           <Box sx={{
             p: 1,
             borderRadius: '5%',
-            backgroundColor: conteudo.status === 'Aberto' ? '#5cb85c' : '#999',
+            backgroundColor: conteudo?.status === 'Aberto' ? '#5cb85c' : '#999',
           }}>
-          Status: {conteudo.status}
+          Status: {conteudo?.status}
           </Box>
-          {conteudo.complemento !== ''&&(
+          {conteudo?.complemento !== ''&&(
             <Box sx={{width:'70%'}}>
-              Complemento: {conteudo.complemento}
+              Complemento: {conteudo?.complemento}
             </Box>
 
           )}

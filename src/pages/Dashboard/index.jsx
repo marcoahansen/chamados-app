@@ -58,7 +58,9 @@ function DashBoard() {
   const[showPostmodal, setShowPostModal] = useState(false)
   const[detail, setDetail] = useState()
 
+
   useEffect(()=>{
+    
     function loadChamados(){
       getDocs(query(chamadosRef, orderBy('created', 'desc'), limit(5)))
       .then((snapshot)=>{
@@ -76,9 +78,8 @@ function DashBoard() {
     
     return() =>{
     }
-
+    
   },[])
-
 
   async function updateState(snapshot){
     const isCollectionEmpty = snapshot.size === 0
@@ -215,12 +216,11 @@ function DashBoard() {
         </Paper>
         }
     </Grid>
-    {showPostmodal && (
-      <Modal
-        conteudo={detail}
-        toggle={togglePostModal}
-      />
-    )}
+    <Modal
+      conteudo={detail}
+      open={showPostmodal}
+      toggle={togglePostModal}
+    />
   </TitleMenu>
   )
 }
