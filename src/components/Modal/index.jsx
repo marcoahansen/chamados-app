@@ -1,53 +1,70 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Modal from '@mui/material/Modal';
 import SearchIcon from '@mui/icons-material/Search';
-import DialogTitle from '@mui/material/DialogTitle';
-import { Box } from '@mui/system';
+import { FullscreenExit } from '@mui/icons-material';
 
-export default function Modal({conteudo, toggle, open}) {
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 500,
+  maxWidth: '100%',
+  bgcolor: 'background.paper',
+  boxShadow: 24,
+  p: 4,
+  display: 'flex',
+  flexDirection: 'column',
+};
+
+export default function ModalDetail({conteudo, toggle, open}) {
   return (
-      <Dialog
+      <Modal
         onClose={toggle}
         open={open}
-        aria-labelledby="dialog-title"
-        
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
       >
-        <DialogTitle sx={{ p: 2, display: 'flex', alignItems:'center'}} id="dialog-title">
+        <Box sx={style}>
+        <Typography sx={{mb: 2, display: 'flex', alignItems:'center'}} id="modal-title">
         Detalhes do chamado
         <SearchIcon sx={{ml:1}}/>
-        </DialogTitle>
-        <DialogContent>
-          <Box>
-            Clliente: {conteudo?.cliente}
+        </Typography>
+        <Box sx={{display:'flex', flexDirection:'column', gap: 2}} id="modal-description">
+          <Box sx={{display: 'flex', alignItems:'center', justifyContent: 'space-between'}}>
+            <Typography>
+              Clliente: {conteudo?.cliente}
+            </Typography>
+            <Typography>
+              Assunto: {conteudo?.assunto}
+            </Typography>
           </Box>
-          <Box>
-            Assunto: {conteudo?.assunto}
-          </Box>
-          <Box>
-            Cadastrado em: {conteudo?.created}
-          </Box>
-          <Box sx={{
-            p: 1,
-            borderRadius: '5%',
-            backgroundColor: conteudo?.status === 'Aberto' ? '#5cb85c' : '#999',
-          }}>
-          Status: {conteudo?.status}
+          <Box sx={{display: 'flex', alignItems:'center', justifyContent: 'space-between'}}>
+            <Typography>
+              Cadastrado em: {conteudo?.created}
+            </Typography>
+            <Box sx={{
+              p: 1,
+              borderRadius: '5%',
+              backgroundColor: conteudo?.status === 'Aberto' ? '#5cb85c' : '#999',
+            }}>
+            Status: {conteudo?.status}
+            </Box>
           </Box>
           {conteudo?.complemento !== ''&&(
-            <Box sx={{width:'70%'}}>
+            <Typography >
               Complemento: {conteudo?.complemento}
-            </Box>
+            </Typography>
 
           )}
-        </DialogContent>
-        <DialogActions>
           <Button variant='contained' onClick={toggle} autoFocus>
             Voltar
           </Button>
-        </DialogActions>
-      </Dialog>
+        </Box>
+        </Box>
+      </Modal>
   )
 }

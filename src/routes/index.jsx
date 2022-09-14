@@ -60,6 +60,11 @@ export default function RoutesApp(){
                     <New/>
                 </PrivateRoute>
             }/>
+            <Route exact path='/new/:id' element={
+                <PrivateRoute>
+                    <New/>
+                </PrivateRoute>
+            }/>
         </Routes>
     )
 }

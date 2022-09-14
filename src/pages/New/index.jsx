@@ -1,5 +1,8 @@
-import { Button, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField } from "@mui/material";
 import { useState, useEffect, useContext } from "react";
+
+import { useNavigate, useParams } from 'react-router-dom'
+
+import { Button, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField } from "@mui/material";
 import { AuthContext } from '../../contexts/auth'
 
 import TitleMenu from "../../components/TitleMenu";
@@ -8,11 +11,15 @@ import { toast } from 'react-toastify'
 
 import firebase from '../../services/firebaseConnection'
 
-import { getFirestore, setDoc, getDoc, updateDoc, addDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, setDoc, getDoc, updateDoc, addDoc, collection, doc, getDocs } from 'firebase/firestore';
+import { LocalDiningRounded } from "@mui/icons-material";
 
 const db = getFirestore(firebase);
 
 function New() {
+
+  const {id} = useParams()
+  const navigate = useNavigate()
 
   const [loadCustomers, setLoadCustomers] = useState(true)
   const [customers, setCustomers] = useState([])
@@ -20,6 +27,7 @@ function New() {
   const [assunto, setAssunto] = useState('')
   const [status, setStatus] = useState('Aberto')
   const [complemento, setComplemento] = useState('')
+  const [idCustomer, setIdCustomer] = useState(false)
 
   const { user } = useContext(AuthContext)
 
@@ -44,6 +52,10 @@ function New() {
 
           setCustomers(lista)
           setLoadCustomers(false)
+
+          if(id){
+            loadId(lista)
+          }
       })
       .catch((error)=>{
           console.log(error)
@@ -54,6 +66,24 @@ function New() {
 
     loadCustumers()
   },[])
+
+  function loadId(lista){
+    getDoc(doc(db,"chamados", id))
+    .then((snapshot)=>{
+      setAssunto(snapshot.data().assunto)
+      setStatus(snapshot.data().status)
+      setComplemento(snapshot.data().complemento)
+
+      let index = lista.findIndex(item => item.id === snapshot.data().clienteId)
+
+      setCustomerSelected(index)
+      setIdCustomer(true)
+    })
+    .catch((error)=>{
+      console.log(error)
+      setIdCustomer(false)
+    })
+  }
 
   function handleChangeCustomers(e){
     setCustomerSelected(e.target.value)
@@ -69,6 +99,31 @@ function New() {
   
   function handleRegister(e){
       e.preventDefault()
+
+      if(idCustomer){
+        updateDoc(doc(db, "chamados", id), {
+          cliente: customers[customerSelected].nomeFantasia,
+          clienteId: customers[customerSelected].id,
+          assunto: assunto,
+          status: status,
+          complemento: complemento,
+          userId: user.uid
+        })
+        .then(()=>{
+          toast.success('Alterações foram salvas com sucesso')
+          setComplemento('')
+          setCustomerSelected(0)
+          navigate('/dashboard')
+        })
+        .catch((error)=>{
+          console.log(error)
+          toast.error('Ops algo deu errado')
+       })
+
+       return
+
+      }
+
       addDoc(collection(db, "chamados"), {
         created: new Date(),
         cliente: customers[customerSelected].nomeFantasia,
@@ -82,6 +137,7 @@ function New() {
           toast.success('Chamado cadastrado com sucesso')
           setComplemento('')
           setCustomerSelected(0)
+          navigate('/dashboard')
        })
        .catch((error)=>{
           console.log(error)
@@ -144,7 +200,7 @@ function New() {
             aria-labelledby="demo-row-radio-buttons-group-label"
             name="row-radio-buttons-group"
             >
-                <FormControlLabel value="Em Aberto" control={<Radio />} label="Aberto" checked={status === 'Aberto'} onChange={handleOptionChange} />
+                <FormControlLabel value="Aberto" control={<Radio />} label="Aberto" checked={status === 'Aberto'} onChange={handleOptionChange} />
                 <FormControlLabel value="Progresso" control={<Radio />} label="Progresso" checked={status === 'Progresso'} onChange={handleOptionChange} />
                 <FormControlLabel value="Atendido" control={<Radio />} label="Atendido" checked={status === 'Atendido'} onChange={handleOptionChange} />
             </RadioGroup>

@@ -5,7 +5,7 @@ import {format} from 'date-fns'
 
 import TitleMenu from "../../components/TitleMenu";
 
-import Modal from "../../components/modal";
+import ModalDetail from "../../components/modal";
 
 import { Box, Button, Grid, IconButton, Paper } from "@mui/material";
 import { styled } from '@mui/material/styles';
@@ -189,8 +189,14 @@ function DashBoard() {
                           >{item.status}</Box></StyledTableCell>
                           <StyledTableCell align="center">{item.created}</StyledTableCell>
                           <StyledTableCell align="center">
-                            <IconButton onClick={()=> togglePostModal(item)}><SearchIcon/></IconButton>
-                            <IconButton><EditIcon/></IconButton>
+                          <IconButton onClick={()=> togglePostModal(item)}>
+                            <SearchIcon/>
+                          </IconButton>
+                            <Link style={{color: "#FFF"}} to={`/new/${item.id}`}>
+                              <IconButton>
+                                <EditIcon/>
+                              </IconButton>
+                            </Link>
                           </StyledTableCell>
                         </StyledTableRow>
                       )
@@ -216,7 +222,7 @@ function DashBoard() {
         </Paper>
         }
     </Grid>
-    <Modal
+    <ModalDetail
       conteudo={detail}
       open={showPostmodal}
       toggle={togglePostModal}

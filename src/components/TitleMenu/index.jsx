@@ -3,9 +3,9 @@ import { useContext } from 'react';
 
 import { Link } from 'react-router-dom'
 
-import avatar from '../assets/avatar.png'
+import avatar from '../../assets/avatar.png'
 
-import { AuthContext } from '../contexts/auth'
+import { AuthContext } from '../../contexts/auth'
 
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
