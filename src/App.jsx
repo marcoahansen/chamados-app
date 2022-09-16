@@ -30,7 +30,7 @@ function App() {
     <AuthProvider>
       <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-        <BrowserRouter basename={process.env.PUBLIC_URL}>
+        <BrowserRouter>
           <ToastContainer theme='colored' autoClose={2000} />
           <RoutesApp/>
         </BrowserRouter>
