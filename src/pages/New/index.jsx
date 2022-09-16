@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 
 import { useNavigate, useParams } from 'react-router-dom'
 
-import { Button, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField } from "@mui/material";
+import {Autocomplete, Button, FormControl, FormControlLabel, FormLabel, Grid, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField } from "@mui/material";
 import { AuthContext } from '../../contexts/auth'
 
 import TitleMenu from "../../components/TitleMenu";
@@ -11,8 +11,7 @@ import { toast } from 'react-toastify'
 
 import firebase from '../../services/firebaseConnection'
 
-import { getFirestore, setDoc, getDoc, updateDoc, addDoc, collection, doc, getDocs } from 'firebase/firestore';
-import { LocalDiningRounded } from "@mui/icons-material";
+import { getFirestore, getDoc, updateDoc, addDoc, collection, doc, getDocs, clearIndexedDbPersistence } from 'firebase/firestore';
 
 const db = getFirestore(firebase);
 
@@ -23,13 +22,17 @@ function New() {
 
   const [loadCustomers, setLoadCustomers] = useState(true)
   const [customers, setCustomers] = useState([])
-  const [customerSelected, setCustomerSelected] = useState(0)
+  const [cliente, setCliente] = useState('')
+  const [inputCliente, setInputCliente] = useState('')
   const [assunto, setAssunto] = useState('')
   const [status, setStatus] = useState('Aberto')
   const [complemento, setComplemento] = useState('')
   const [idCustomer, setIdCustomer] = useState(false)
 
   const { user } = useContext(AuthContext)
+
+
+  
 
   useEffect(()=>{
     function loadCustumers(){
@@ -54,7 +57,7 @@ function New() {
           setLoadCustomers(false)
 
           if(id){
-            loadId(lista)
+            loadId()
           }
       })
       .catch((error)=>{
@@ -65,28 +68,24 @@ function New() {
     }
 
     loadCustumers()
+    console.log(cliente)
   },[])
 
-  function loadId(lista){
+  function loadId(){
     getDoc(doc(db,"chamados", id))
     .then((snapshot)=>{
       setAssunto(snapshot.data().assunto)
       setStatus(snapshot.data().status)
       setComplemento(snapshot.data().complemento)
+      setCliente(snapshot.data().cliente)
+      
 
-      let index = lista.findIndex(item => item.id === snapshot.data().clienteId)
-
-      setCustomerSelected(index)
       setIdCustomer(true)
     })
     .catch((error)=>{
       console.log(error)
       setIdCustomer(false)
     })
-  }
-
-  function handleChangeCustomers(e){
-    setCustomerSelected(e.target.value)
   }
 
   function handleChangeAssunto(e){
@@ -102,8 +101,8 @@ function New() {
 
       if(idCustomer){
         updateDoc(doc(db, "chamados", id), {
-          cliente: customers[customerSelected].nomeFantasia,
-          clienteId: customers[customerSelected].id,
+          cliente: cliente.nomeFantasia,
+          clienteId: cliente.id,
           assunto: assunto,
           status: status,
           complemento: complemento,
@@ -112,7 +111,6 @@ function New() {
         .then(()=>{
           toast.success('Alterações foram salvas com sucesso')
           setComplemento('')
-          setCustomerSelected(0)
           navigate('/dashboard')
         })
         .catch((error)=>{
@@ -126,8 +124,8 @@ function New() {
 
       addDoc(collection(db, "chamados"), {
         created: new Date(),
-        cliente: customers[customerSelected].nomeFantasia,
-        clienteId: customers[customerSelected].id,
+        cliente: cliente.nomeFantasia,
+        clienteId: cliente.id,
         assunto: assunto,
         status: status,
         complemento: complemento,
@@ -136,7 +134,6 @@ function New() {
        .then(()=>{
           toast.success('Chamado cadastrado com sucesso')
           setComplemento('')
-          setCustomerSelected(0)
           navigate('/dashboard')
        })
        .catch((error)=>{
@@ -145,38 +142,37 @@ function New() {
        })
   }
 
+  
   return (
       <TitleMenu title='Novo Chamado'>
       <Grid item xs={12}>
         <Paper component="form" onSubmit={handleRegister} sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
           <FormControl sx={{mb:2}}>
-            <InputLabel id="select-client-label">Cliente</InputLabel>
-            {loadCustomers ?(
-            <Select
-                disabled={true}
-                labelId="select-client-label"
-                id="select-client"
-                value='Carregando Clientes...'
-                label="Cliente"
-            >
-              <MenuItem value='Carregando Clientes...'>Carregando Clientes...</MenuItem>
-            </Select>
+            {loadCustomers ? (
+               <Select
+                  disabled={true}
+                  labelId="select-client-label"
+                  id="select-client"
+                  value='Carregando Clientes...'
+                  label="Cliente"
+                >
+                  <MenuItem value='Carregando Clientes...'>Carregando Clientes...</MenuItem>
+                </Select>
             ) : (
-
-            <Select
-                required={true}
-                labelId="select-client-label"
-                id="select-client"
-                value={customerSelected}
-                label="Cliente"
-                onChange={handleChangeCustomers}
-            >
-              {customers.map((item,index)=>{
-                return(
-                  <MenuItem key={item.id} value={index}>{item.nomeFantasia}</MenuItem>
-                )
-              })}
-            </Select>
+              <Autocomplete
+                value={cliente}
+                onChange={(event, newValue)=>{
+                  setCliente(newValue)
+                }}
+                inputValue={inputCliente}
+                onInputChange={(event, newInputValue)=>{
+                  setInputCliente(newInputValue);
+                }}
+                id='lista-clientes'
+                options={customers}
+                getOptionLabel={(option) => option.nomeFantasia ?? option }
+                renderInput={(params) => <TextField {...params} label="Cliente" />}
+              />
             )}
           </FormControl>
           <FormControl sx={{mb:2}}>

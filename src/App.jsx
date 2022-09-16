@@ -28,10 +28,10 @@ function App() {
 
   return (
     <AuthProvider>
-      <ToastContainer theme='colored' autoClose={2000} />
       <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-        <BrowserRouter>
+        <BrowserRouter basename={process.env.PUBLIC_URL}>
+          <ToastContainer theme='colored' autoClose={2000} />
           <RoutesApp/>
         </BrowserRouter>
       </ThemeProvider>

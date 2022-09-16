@@ -4,7 +4,6 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import SearchIcon from '@mui/icons-material/Search';
-import { FullscreenExit } from '@mui/icons-material';
 
 const style = {
   position: 'absolute',
