@@ -46,12 +46,12 @@ function AuthProvider({children}){
             }
             setUser(data)
             storageUser(data)
-            toast.success('Bem vindo de volta!')
+            //toast.success('Bem vindo de volta!')
             setLoadingAuth(false)
         })
         })
         .catch((error)=>{
-            toast.error('Algo deu errado')
+            //toast.error('Algo deu errado')
             console.log('erro ao fazer login' + error)
             setLoadingAuth(false)
         })
@@ -74,16 +74,16 @@ function AuthProvider({children}){
                 }
                 setUser(data)
                 storageUser(data)
-                toast.success('Bem vindo a plataforma')
+                //toast.success('Bem vindo a plataforma')
                 setLoadingAuth(false)
             })
             .catch((error)=>{
-                toast.error('Algo deu errado')
+                //toast.error('Algo deu errado')
                 console.log('salvar no banco' + error)
             })
         })
         .catch((error)=>{
-            toast.error('Algo deu errado ')
+            //toast.error('Algo deu errado ')
             console.log('createUser' + error)
             setLoadingAuth(false)
         })
@@ -95,7 +95,7 @@ function AuthProvider({children}){
 
     function logOut(){
         signOut(auth).then(() => {
-            toast.success('saiu com sucesso')
+            //toast.success('saiu com sucesso')
           console.log('saiu com sucesso')
           localStorage.removeItem('SistemaUser')
           setUser(null)

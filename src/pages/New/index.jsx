@@ -11,7 +11,7 @@ import { toast } from 'react-toastify'
 
 import firebase from '../../services/firebaseConnection'
 
-import { getFirestore, getDoc, updateDoc, addDoc, collection, doc, getDocs, clearIndexedDbPersistence } from 'firebase/firestore';
+import { getFirestore, getDoc, updateDoc, addDoc, collection, doc, getDocs } from 'firebase/firestore';
 
 const db = getFirestore(firebase);
 
@@ -52,7 +52,7 @@ function New() {
             setLoadCustomers(false)
             return
           }
-
+          
           setCustomers(lista)
           setLoadCustomers(false)
 
@@ -68,19 +68,19 @@ function New() {
     }
 
     loadCustumers()
-    console.log(cliente)
   },[])
 
   function loadId(){
     getDoc(doc(db,"chamados", id))
     .then((snapshot)=>{
+
       setAssunto(snapshot.data().assunto)
       setStatus(snapshot.data().status)
       setComplemento(snapshot.data().complemento)
-      setCliente(snapshot.data().cliente)
-      
-
+      setCliente({id: snapshot.data().clienteId, nomeFantasia: snapshot.data().cliente})
       setIdCustomer(true)
+      console.log(cliente.id)
+
     })
     .catch((error)=>{
       console.log(error)
@@ -112,6 +112,7 @@ function New() {
           toast.success('Alterações foram salvas com sucesso')
           setComplemento('')
           navigate('/dashboard')
+          console.log(cliente)
         })
         .catch((error)=>{
           console.log(error)
