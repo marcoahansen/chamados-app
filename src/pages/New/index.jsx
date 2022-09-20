@@ -61,7 +61,7 @@ function New() {
           }
       })
       .catch((error)=>{
-          console.log(error)
+          (error)
           setLoadCustomers(false)
           setCustomers([{id:'1',nomeFantasia:''}])
       })
@@ -79,11 +79,9 @@ function New() {
       setComplemento(snapshot.data().complemento)
       setCliente({id: snapshot.data().clienteId, nomeFantasia: snapshot.data().cliente})
       setIdCustomer(true)
-      console.log(cliente.id)
 
     })
     .catch((error)=>{
-      console.log(error)
       setIdCustomer(false)
     })
   }
@@ -112,11 +110,9 @@ function New() {
           toast.success('Alterações foram salvas com sucesso')
           setComplemento('')
           navigate('/dashboard')
-          console.log(cliente)
         })
         .catch((error)=>{
-          console.log(error)
-          toast.error('Ops algo deu errado')
+          toast.error('Ops, algo deu errado')
        })
 
        return
@@ -138,7 +134,6 @@ function New() {
           navigate('/dashboard')
        })
        .catch((error)=>{
-          console.log(error)
           toast.error('Erro ao cadastrar o chamado')
        })
   }

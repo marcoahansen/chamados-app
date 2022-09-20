@@ -46,13 +46,12 @@ function AuthProvider({children}){
             }
             setUser(data)
             storageUser(data)
-            //toast.success('Bem vindo de volta!')
+            toast.success('Bem vindo de volta!')
             setLoadingAuth(false)
         })
         })
         .catch((error)=>{
-            //toast.error('Algo deu errado')
-            console.log('erro ao fazer login' + error)
+            toast.error('Algo deu errado')
             setLoadingAuth(false)
         })
     }
@@ -74,17 +73,15 @@ function AuthProvider({children}){
                 }
                 setUser(data)
                 storageUser(data)
-                //toast.success('Bem vindo a plataforma')
+                toast.success('Bem vindo a plataforma')
                 setLoadingAuth(false)
             })
             .catch((error)=>{
-                //toast.error('Algo deu errado')
-                console.log('salvar no banco' + error)
+                toast.error('Algo deu errado')
             })
         })
         .catch((error)=>{
-            //toast.error('Algo deu errado ')
-            console.log('createUser' + error)
+            toast.error('Algo deu errado ')
             setLoadingAuth(false)
         })
     }
@@ -95,12 +92,11 @@ function AuthProvider({children}){
 
     function logOut(){
         signOut(auth).then(() => {
-            //toast.success('saiu com sucesso')
-          console.log('saiu com sucesso')
-          localStorage.removeItem('SistemaUser')
-          setUser(null)
+            toast.success('saiu com sucesso')
+            localStorage.removeItem('SistemaUser')
+            setUser(null)
         }).catch((error) => {
-          console.log('algo de errado aconteceu' + error)
+            toast.error('Ops, algo deu errado')
         });
     }
 

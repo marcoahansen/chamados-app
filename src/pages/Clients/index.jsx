@@ -31,7 +31,6 @@ function Clients() {
       toast.success('Empresa cadastrada com sucesso')
    })
    .catch((error)=>{
-      console.log(error)
       toast.error('Erro ao cadastrar esse empresa!')
    })
   }

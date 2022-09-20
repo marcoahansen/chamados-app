@@ -67,7 +67,6 @@ function DashBoard() {
         updateState(snapshot)
       })
       .catch((error)=>{
-        console.log(error)
         setLoadMore(false)
       })
   
@@ -104,7 +103,6 @@ function DashBoard() {
       setLastDocs(lastDoc)
     }else{
       setIsEmpty(true)
-      console.log('empty is true')
     }
     setLoadMore(false)
   }
@@ -116,7 +114,6 @@ function DashBoard() {
       updateState(snapshot)
     })
     .catch((error)=>{
-      console.log(error)
       setLoadMore(false)
     })
 

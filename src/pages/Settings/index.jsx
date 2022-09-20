@@ -52,7 +52,6 @@ function Settings() {
       uploadBytes(refFile, imageAvatar)
       .then((snapshot)=>{
         toast.success('Foto enviada com sucesso')
-        console.log(snapshot)
         getDownloadURL(ref(storage, refFile))
         .then((url)=>{
           let urlFoto = url
