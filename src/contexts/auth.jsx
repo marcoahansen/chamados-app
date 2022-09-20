@@ -13,7 +13,6 @@ export const AuthContext = createContext({});
 
 function AuthProvider({children}){
     const [user, setUser] = useState(null);
-    const [loadingAuth, setLoadingAuth] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(()=>{
@@ -33,8 +32,7 @@ function AuthProvider({children}){
     }, [])
 
     function logIn(email, password){
-        setLoadingAuth(true)
-        signInWithEmailAndPassword(auth, email, password)
+        return signInWithEmailAndPassword(auth, email, password)
         .then((value)=>{
         getDoc(doc(db, "users", value.user.uid))
         .then((snapshot)=>{
@@ -47,18 +45,15 @@ function AuthProvider({children}){
             setUser(data)
             storageUser(data)
             toast.success('Bem vindo de volta!')
-            setLoadingAuth(false)
         })
         })
         .catch((error)=>{
             toast.error('Algo deu errado')
-            setLoadingAuth(false)
         })
     }
 
     function signUp(email, password, nome){
-        setLoadingAuth(true)
-        createUserWithEmailAndPassword(auth, email, password)
+         return createUserWithEmailAndPassword(auth, email, password)
         .then((value)=>{
             setDoc(doc(db, "users", value.user.uid), {
                nome: nome,
@@ -74,7 +69,6 @@ function AuthProvider({children}){
                 setUser(data)
                 storageUser(data)
                 toast.success('Bem vindo a plataforma')
-                setLoadingAuth(false)
             })
             .catch((error)=>{
                 toast.error('Algo deu errado')
@@ -82,7 +76,6 @@ function AuthProvider({children}){
         })
         .catch((error)=>{
             toast.error('Algo deu errado ')
-            setLoadingAuth(false)
         })
     }
 
@@ -108,7 +101,6 @@ function AuthProvider({children}){
             signUp,
             logOut,
             logIn,
-            loadingAuth,
             setUser,
             storageUser
             }}

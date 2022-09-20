@@ -18,13 +18,17 @@ function SignUp() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false)
 
-  const { signUp, loadingAuth } = useContext(AuthContext);
+  const { signUp } = useContext(AuthContext);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if(nome !== '' && email !== '' && password !== ''){
-      signUp(email, password, nome)
+      setLoading(true)
+      signUp(email, password, nome).finally(()=>{
+        setLoading(false)
+      })
     }
   };
 
@@ -87,7 +91,7 @@ function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              { loadingAuth ? 'Cadastrando...' :'Cadastrar' }
+              { loading ? 'Cadastrando...' :'Cadastrar' }
               
             </Button>
             <Grid container>

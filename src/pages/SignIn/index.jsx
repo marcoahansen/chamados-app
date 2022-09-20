@@ -21,13 +21,17 @@ function SignIn() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false)
 
-  const { logIn, loadingAuth } = useContext(AuthContext);
+  const { logIn } = useContext(AuthContext);
 
   const handleSubmit = (event) => {
     event.preventDefault();
     if(email !== '' && password !== ''){
-      logIn(email, password)
+      setLoading(true)
+      logIn(email, password).finally(()=>{
+        setLoading(false)
+      })
     }
   };
 
@@ -78,7 +82,7 @@ function SignIn() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              { loadingAuth ? 'Carregando...' :'Acessar' }
+              { loading ? 'Carregando...' :'Acessar' }
             </Button>
             <Grid container>
               <Grid item xs>
