@@ -48,12 +48,12 @@ function AuthProvider({children}){
         })
         })
         .catch((error)=>{
-            toast.error('Algo deu errado')
+            toast.error('Credenciais inválidas')
         })
     }
 
     function signUp(email, password, nome){
-         return createUserWithEmailAndPassword(auth, email, password)
+        return createUserWithEmailAndPassword(auth, email, password)
         .then((value)=>{
             setDoc(doc(db, "users", value.user.uid), {
                nome: nome,
@@ -71,7 +71,7 @@ function AuthProvider({children}){
                 toast.success('Bem vindo a plataforma')
             })
             .catch((error)=>{
-                toast.error('Algo deu errado')
+                toast.error('Credenciais inválidas')
             })
         })
         .catch((error)=>{
