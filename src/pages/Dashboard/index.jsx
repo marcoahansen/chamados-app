@@ -5,7 +5,7 @@ import {format} from 'date-fns'
 
 import TitleMenu from "../../components/TitleMenu";
 
-import ModalDetail from "../../components/modal";
+import ModalDetail from "../../components/Modal";
 
 import { Box, Button, Grid, IconButton, Paper } from "@mui/material";
 import { styled } from '@mui/material/styles';
