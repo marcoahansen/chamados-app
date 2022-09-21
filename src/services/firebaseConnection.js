@@ -7,7 +7,7 @@ const firebaseConfig = {
   storageBucket: "chamados-3c90b.appspot.com",
   messagingSenderId: "884577288919",
   appId: "1:884577288919:web:da083be8f9eaddadb6a692",
-  measurementId: "G-3GN2N0DSMN"
+  measurementId: "G-3GN2N0DSMN",
 };
 
 const firebase = initializeApp(firebaseConfig);
