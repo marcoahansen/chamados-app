@@ -20,6 +20,37 @@ const style = {
 };
 
 export default function ModalDetail({ conteudo, toggle, open }) {
+  const renderMedia = () => {
+    if (!conteudo?.arquivos || conteudo.arquivos.length === 0) {
+      return null;
+    }
+
+    return (
+      <Box sx={{ mt: 4 }}>
+        <Box>
+          <Typography variant="h6">Mídia:</Typography>
+          {conteudo?.arquivos?.map((url, index) => {
+            const extension = getExtensionFromUrl(url);
+            const mimeType = getMimeTypeFromExtension(extension);
+
+            if (mimeType.startsWith('image/')) {
+              return <img key={index} src={url} alt={`Imagem ${index + 1}`} style={{ maxWidth: "50%" }} />;
+            } else if (mimeType === 'video/mp4') {
+              return (
+                <video key={index} style={{ maxWidth: "100%" }} controls>
+                  <source src={url} type="video/mp4" />
+                  Seu navegador não suporta a reprodução de vídeos.
+                </video>
+              );
+            }
+
+            return null;
+          })}
+        </Box>
+      </Box>
+    );
+  };
+
   return (
     <Modal
       onClose={toggle}
@@ -71,6 +102,7 @@ export default function ModalDetail({ conteudo, toggle, open }) {
           {conteudo?.complemento !== "" && (
             <Typography>Complemento: {conteudo?.complemento}</Typography>
           )}
+          {renderMedia()}
           <Button variant="contained" onClick={toggle} autoFocus>
             Voltar
           </Button>
@@ -78,4 +110,24 @@ export default function ModalDetail({ conteudo, toggle, open }) {
       </Box>
     </Modal>
   );
+}
+
+function getExtensionFromUrl(url) {
+  const path = url.split('/').pop();
+  const filename = path.split('?')[0];
+  const extension = filename.split('.').pop();
+  return extension.toLowerCase();
+}
+
+function getMimeTypeFromExtension(extension) {
+  switch (extension) {
+    case 'jpg':
+    case 'jpeg':
+    case 'png':
+      return 'image/' + extension;
+    case 'mp4':
+      return 'video/mp4';
+    default:
+      return 'application/octet-stream';
+  }
 }

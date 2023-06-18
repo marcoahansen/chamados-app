@@ -2,19 +2,29 @@ import { useState, useEffect, useContext } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 
+
+import DeleteIcon from '@mui/icons-material/Delete';
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import TaskIcon from '@mui/icons-material/Task';
+
+
+
 import {
   Autocomplete,
+  Box,
   Button,
   FormControl,
   FormControlLabel,
   FormLabel,
   Grid,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Radio,
   RadioGroup,
   Select,
+  Stack,
   TextField,
 } from "@mui/material";
 import { AuthContext } from "../../contexts/auth";
@@ -24,6 +34,10 @@ import TitleMenu from "../../components/TitleMenu";
 import { toast } from "react-toastify";
 
 import firebase from "../../services/firebaseConnection";
+
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+
+const storage = getStorage(firebase);
 
 import {
   getFirestore,
@@ -49,6 +63,9 @@ function New() {
   const [status, setStatus] = useState("Aberto");
   const [complemento, setComplemento] = useState("");
   const [idCustomer, setIdCustomer] = useState(false);
+  const [fileList, setFileList] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [temporaryUrls, setTemporaryUrls] = useState([]);
 
   const { user } = useContext(AuthContext);
 
@@ -88,6 +105,41 @@ function New() {
     loadCustumers();
   }, []);
 
+  function getFileTypeFromUrl(url) {
+    const extension = getExtensionFromUrl(url);
+    const mimeType = getMimeTypeFromExtension(extension);
+    return mimeType;
+  }
+
+  function getExtensionFromUrl(url) {
+    const path = url.split('/').pop();
+    const filename = path.split('?')[0];
+    const extension = filename.split('.').pop();
+    return extension.toLowerCase();
+  }
+
+  function getMimeTypeFromExtension(extension) {
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return 'image/' + extension;
+      case 'mp4':
+        return 'video/mp4';
+      default:
+        return 'application/octet-stream';
+    }
+  }
+
+  function getFileNameFromUrl(url) {
+    const decodedUrl = decodeURIComponent(url);
+    const startIndex = decodedUrl.lastIndexOf("/") + 1;
+    const endIndex = decodedUrl.lastIndexOf("?") !== -1 ? decodedUrl.lastIndexOf("?") : decodedUrl.length;
+    const fileName = decodedUrl.substring(startIndex, endIndex);
+    return fileName;
+  }
+
+
   function loadId() {
     getDoc(doc(db, "chamados", id))
       .then((snapshot) => {
@@ -98,6 +150,21 @@ function New() {
           id: snapshot.data().clienteId,
           nomeFantasia: snapshot.data().cliente,
         });
+
+        const arquivos = snapshot.data().arquivos || [];
+        const newFileList = [];
+        const newTemporaryUrls = [];
+
+        for (const url of arquivos) {
+          const fileName = getFileNameFromUrl(url);
+          const fileType = getFileTypeFromUrl(url);
+          const file = new File([], fileName, { type: fileType });
+          newFileList.push(file);
+          newTemporaryUrls.push(url);
+        }
+
+        setFileList(newFileList);
+        setTemporaryUrls(newTemporaryUrls);
         setIdCustomer(true);
       })
       .catch((error) => {
@@ -113,48 +180,73 @@ function New() {
     setStatus(e.target.value);
   }
 
-  function handleRegister(e) {
+  async function handleRegister(e) {
     e.preventDefault();
 
-    if (idCustomer) {
-      updateDoc(doc(db, "chamados", id), {
-        cliente: cliente.nomeFantasia,
-        clienteId: cliente.id,
-        assunto: assunto,
-        status: status,
-        complemento: complemento,
-        userId: user.uid,
-      })
-        .then(() => {
-          toast.success("Alterações foram salvas com sucesso");
-          setComplemento("");
-          navigate("/dashboard");
-        })
-        .catch((error) => {
-          toast.error("Ops, algo deu errado");
-        });
+    const urlArray = [];
+    setLoading(true)
+    try {
+      for (const file of fileList) {
+        const refFile = ref(storage, `images/uploadchamados/${file.name}`);
+        const snapshot = await uploadBytes(refFile, file);
+        const url = await getDownloadURL(refFile);
+        urlArray.push(url);
+      }
 
-      return;
+      if (idCustomer) {
+        await updateDoc(doc(db, "chamados", id), {
+          cliente: cliente.nomeFantasia,
+          clienteId: cliente.id,
+          assunto: assunto,
+          status: status,
+          complemento: complemento,
+          arquivos: urlArray,
+          userId: user.uid,
+        });
+        toast.success("Alterações foram salvas com sucesso");
+      } else {
+        await addDoc(collection(db, "chamados"), {
+          created: new Date(),
+          cliente: cliente.nomeFantasia,
+          clienteId: cliente.id,
+          assunto: assunto,
+          status: status,
+          complemento: complemento,
+          arquivos: urlArray,
+          userId: user.uid,
+        });
+        toast.success("Chamado cadastrado com sucesso");
+      }
+
+      setComplemento("");
+      navigate("/dashboard");
+      setLoading(false)
+    } catch (error) {
+      toast.error("Erro ao processar o chamado");
     }
 
-    addDoc(collection(db, "chamados"), {
-      created: new Date(),
-      cliente: cliente.nomeFantasia,
-      clienteId: cliente.id,
-      assunto: assunto,
-      status: status,
-      complemento: complemento,
-      userId: user.uid,
-    })
-      .then(() => {
-        toast.success("Chamado cadastrado com sucesso");
-        setComplemento("");
-        navigate("/dashboard");
-      })
-      .catch((error) => {
-        toast.error("Erro ao cadastrar o chamado");
-      });
   }
+
+  const handleFile = (e) => {
+    const newFiles = Array.from(e.target.files);
+    const newTemporaryUrls = [];
+
+    for (const file of newFiles) {
+      const temporaryUrl = URL.createObjectURL(file);
+      newTemporaryUrls.push(temporaryUrl);
+    }
+
+    setFileList((prevFiles) => [...prevFiles, ...newFiles]);
+    setTemporaryUrls((prevUrls) => [...prevUrls, ...newTemporaryUrls]);
+  };
+
+
+  const fileRemove = (file) => {
+    const updatedFiles = [...fileList]
+    updatedFiles.splice(fileList.indexOf(file), 1);
+    setFileList(updatedFiles)
+  }
+
 
   return (
     <TitleMenu title="Novo Chamado">
@@ -253,13 +345,51 @@ function New() {
             value={complemento}
             onChange={(e) => setComplemento(e.target.value)}
           />
+
+          <Button
+            component="label"
+            variant="contained"
+            sx={{ display: "flex", gap: "10px", maxWidth: "40%", mt: 2, p: 1 }}
+          >
+            <FileUploadIcon />
+            Upload de imagens e vídeos do chamado
+            <input hidden onChange={handleFile} id="file" type="file" multiple />
+          </Button>
+          {fileList && fileList.length > 0 ? (
+            <Stack spacing={2} sx={{ my: 2 }}>
+              {fileList.map((file, i) => (
+                <Box key={i}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    backgroundColor: "#444444",
+                    gap: 2,
+                    maxWidth: "70%",
+                    borderRadius: 1.5,
+                    p: 1,
+                  }}>
+                  {file.type.startsWith("image/") ? (
+                    <img src={temporaryUrls[i]} alt={`Image ${i}`} style={{ maxWidth: "10%" }} />
+                  ) : (
+                    <TaskIcon fontSize="large" />
+                  )}
+                  <div>
+                    {file.name} - {file.type}
+                  </div>
+                  <IconButton onClick={() => fileRemove(file)}><DeleteIcon sx={{ color: "#FF0000" }} /></IconButton>
+                </Box>
+              ))}
+            </Stack>
+          ) : null}
+
           <Button
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Cadastrar
+            {loading ? "Cadastrando" : "Cadastrar"}
           </Button>
         </Paper>
       </Grid>

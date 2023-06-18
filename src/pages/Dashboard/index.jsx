@@ -85,7 +85,7 @@ function DashBoard() {
 
     loadChamados();
 
-    return () => {};
+    return () => { };
   }, []);
 
   async function updateState(snapshot) {
@@ -103,6 +103,7 @@ function DashBoard() {
           created: format(doc.data().created.toDate(), "dd/MM/yyyy"),
           status: doc.data().status,
           complemento: doc.data().complemento,
+          arquivos: doc.data().arquivos
         });
       });
       const lastDoc = snapshot.docs[snapshot.docs.length - 1];
