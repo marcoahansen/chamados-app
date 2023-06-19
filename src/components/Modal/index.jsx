@@ -34,7 +34,7 @@ export default function ModalDetail({ conteudo, toggle, open }) {
             const mimeType = getMimeTypeFromExtension(extension);
 
             if (mimeType.startsWith('image/')) {
-              return <img key={index} src={url} alt={`Imagem ${index + 1}`} style={{ maxWidth: "50%" }} />;
+              return <img key={index} src={url} alt={`Imagem ${index + 1}`} style={{ maxWidth: "30%" }} />;
             } else if (mimeType === 'video/mp4') {
               return (
                 <video key={index} style={{ maxWidth: "100%" }} controls>
