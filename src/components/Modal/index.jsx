@@ -10,7 +10,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 500,
+  width: 600,
   maxWidth: "100%",
   bgcolor: "background.paper",
   boxShadow: 24,
@@ -37,7 +37,7 @@ export default function ModalDetail({ conteudo, toggle, open }) {
               return <img key={index} src={url} alt={`Imagem ${index + 1}`} style={{ maxWidth: "30%" }} />;
             } else if (mimeType === 'video/mp4') {
               return (
-                <video key={index} style={{ maxWidth: "100%" }} controls>
+                <video key={index} style={{ maxWidth: "50%" }} controls>
                   <source src={url} type="video/mp4" />
                   Seu navegador não suporta a reprodução de vídeos.
                 </video>
